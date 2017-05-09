@@ -5,27 +5,29 @@ function love.load()
 	require('bump')
 	require('bullet')
 	require('target')
-	world1 = bump.newWorld()
+	require('obj')
+	world1 = bump.newWorld(128)
 	Player = player.new(50,20, "player 1")
 	tnum = 0
 	tcount = 0
 	targettimer = 0
 	camera = {}
-	camera.x = -Player.x +love.graphics.getWidth()/2
-	camera.y = -Player.y +love.graphics.getHeight()/2
+	camera.x = -Player.getX() +love.graphics.getWidth()/2
+	camera.y = -Player.getY() +love.graphics.getHeight()/2
 	blocks = {}
-	blocks["1"] = block.new(20,200,1000,50, "1")
-	blocks["5"] = block.new(20,-200,1000,50, "5")
-	blocks["2"] = block.new(20,-200,20,400, "2")
-	blocks["3"] = block.new(1000,-200,20,400, "3")
-	blocks["4"] = block.new(500,120,200,10, "4")
+	blocks["b 1"] = block.new(20,200,1000,50, "b 1")
+	blocks["b 2"] = block.new(20,-200,20,400, "b 2")
+	blocks["b 3"] = block.new(1000,-200,20,400, "b 3")
+	blocks["b 4"] = block.new(500,120,200,10, "b 4")
+	blocks["b 5"] = block.new(20,-200,1000,50, "b 5")
 	targets = {}
+	obj = obj.new(50,150, "obj")
 end
 
 function love.update(dt)
 	targettimer = targettimer + dt
 	print(tcount)
-	if targettimer > 1 and tcount<9 then
+	if targettimer > 0.01 and tcount<50 then
 		tnum = (tnum+1)%300
 		newT = target.new(550,50,"t " .. tnum)
 		targets[newT.name] = newT
@@ -37,8 +39,8 @@ function love.update(dt)
 		target.update(dt)
 	end
 	fps = love.timer.getFPS( )
-	camera.x = -Player.x +love.graphics.getWidth()/2
-	camera.y = -Player.y +love.graphics.getHeight()/2
+	camera.x = -Player.getX() +love.graphics.getWidth()/2
+	camera.y = -Player.getY() +love.graphics.getHeight()/2
 end
 
 function love.draw()
@@ -50,6 +52,7 @@ function love.draw()
 		target.draw()
 	end
 	love.graphics.printf( fps, 0, 0, love.graphics.getWidth(), "right" )
+	obj.draw()                                                           
 end
 
 function string.explode(str, div)

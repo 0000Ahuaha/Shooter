@@ -15,13 +15,13 @@ function target.new(x,y,name)
 	self.w = 32
 	self.h = 64
 	self.name = name
-	self.life = 3
+	self.life = 15
 	world1:add(self.name, self.x, self.y, self.w, self.h)
 	
 	local Targetfilter = function(item, other)
 		--print(other)
 		local name = string.explode(tostring(other), " ")
-		if name[1] == "player" or name[1] == "t" then return "cross"
+		if name[1] == "player" or name[1] == "t" or name[1] == "obj" then return "cross"
 		else return "slide"
 		end
 	end
@@ -41,7 +41,7 @@ function target.new(x,y,name)
 		self.coll.b = false 
 		for i=1, len do
 			local name = string.explode(cols[i].other, " ")
-			if name[1] ~= "bullet" and name[1] ~= "t" and name[1] ~= "player" then
+			if name[1] == "b" then
 				if cols[i].normal.y == -1 then self.coll.b = true end
 				if cols[i].normal.x ~=0 then
 					self.dir = self.dir *(-1)
