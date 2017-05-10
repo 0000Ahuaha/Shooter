@@ -32,7 +32,7 @@ function bullet.new(x,y,dir, name, player, ang)
 	
 	
 	
-	self.update = function(dt)
+	function self.update(dt)
 		self.mov.x = self.x + self.speed*self.ang.x*dt
 		self.mov.y = self.y + self.speed*self.ang.y*dt
 		local actX, actY, cols, len = world1:move(self.name, self.mov.x, self.mov.y, Bulletfilter)
@@ -60,7 +60,7 @@ function bullet.new(x,y,dir, name, player, ang)
 		end
 	end
 	
-	self.draw = function()
+	function self.draw()
 		love.graphics.rectangle("line", self.x+camera.x, self.y+camera.y, 10,10)
 	end
 	return self
