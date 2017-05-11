@@ -23,7 +23,7 @@ function level1.new()
 	function self.update(dt)
 		targettimer = targettimer + dt
 		print(tcount)
-		if targettimer > 0.01 and tcount<15 then
+		if targettimer > 1 and tcount<15 then
 			tnum = (tnum+1)%300
 			newT = target.new(550,50,"t " .. tnum)
 			targets[newT.name] = newT

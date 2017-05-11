@@ -41,7 +41,7 @@ function target.new(x,y,name)
 		self.coll.b = false 
 		for i=1, len do
 			local name = string.explode(cols[i].other, " ")
-			if name[1] == "b" then
+			if name[1] == "b" or name[1] == "obj" then
 				if cols[i].normal.y == -1 then self.coll.b = true end
 				if cols[i].normal.x ~=0 then
 					self.dir = self.dir *(-1)
