@@ -21,7 +21,7 @@ function target.new(x,y,name)
 	local Targetfilter = function(item, other)
 		--print(other)
 		local name = string.explode(tostring(other), " ")
-		if name[1] == "player" or name[1] == "t" or name[1] == "obj" then return "cross"
+		if name[1] == "player" or name[1] == "t" then return "cross"
 		else return "slide"
 		end
 	end
