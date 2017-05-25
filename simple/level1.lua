@@ -21,6 +21,9 @@ function level1.new()
 	obj = obj.new(50,150, "obj")
 
 	function self.update(dt)
+		if love.keyboard.isDown("escape") then
+			love.event.quit(0)
+		end
 		targettimer = targettimer + dt
 		print(tcount)
 		if targettimer > 1 and tcount<15 then
@@ -40,6 +43,12 @@ function level1.new()
 	end
 	
 	function self.draw()
+    		local touches = love.touch.getTouches()
+ 
+    		for i, id in ipairs(touches) do
+      			local x, y = love.touch.getPosition(id)
+        		love.graphics.circle("fill", x, y, 20)
+    		end
 		for b, block in pairs(blocks) do
 			block.draw()
 		end
