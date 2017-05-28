@@ -1,24 +1,25 @@
 target ={}
 
 function target.new(x,y,name)
-	local self = {}
-	self.x = x
-	self.y = y
-	self.dir = 1
-	self.xvel = 200 --love.math.random(180,220)
-	self.yvel = 0
-	self.coll = {}
-	self.coll.b = false
-	self.mov = {}
-	self.mov.x = 0
-	self.mov.y = 0
-	self.w = 32
-	self.h = 64
-	self.name = name
-	self.life = 15
-	world1:add(self.name, self.x, self.y, self.w, self.h)
+	local private = {}
+	local public = {}
+	private.x = x
+	private.y = y
+	private.dir = 1
+	private.xvel = 200 --love.math.random(180,220)
+	private.yvel = 0
+	private.coll = {}
+	private.coll.b = false
+	private.mov = {}
+	private.mov.x = 0
+	private.mov.y = 0
+	private.w = 32
+	private.h = 64
+	private.name = name
+	private.life = 5
+	world1:add(private.name, private.x, private.y, private.w, private.h)
 	
-	local Targetfilter = function(item, other)
+	private.Targetfilter = function(item, other)
 		--print(other)
 		local name = string.explode(tostring(other), " ")
 		if name[1] == "player" or name[1] == "t" then return "cross"
@@ -26,39 +27,52 @@ function target.new(x,y,name)
 		end
 	end
 	
-	self.update = function(dt)
-		if self.coll.b == false then
-			self.yvel = self.yvel +dt*800
+	public.update = function(dt)
+		if private.coll.b == false then
+			private.yvel = private.yvel +dt*800
 		else
-			self.yvel = 0
+			private.yvel = 0
 		end
-		self.mov.x = self.x + dt*self.xvel*self.dir
-		self.mov.y = self.y + dt*self.yvel
-		local actX, actY, cols, len = world1:move(self.name, self.mov.x, self.mov.y, Targetfilter)
-		self.x = actX
-		self.y = actY
+		private.mov.x = private.x + dt*private.xvel*private.dir
+		private.mov.y = private.y + dt*private.yvel
+		local actX, actY, cols, len = world1:move(private.name, private.mov.x, private.mov.y, private.Targetfilter)
+		private.x = actX
+		private.y = actY
 		
-		self.coll.b = false 
+		private.coll.b = false 
 		for i=1, len do
 			local name = string.explode(cols[i].other, " ")
 			if name[1] == "b" or name[1] == "obj" then
-				if cols[i].normal.y == -1 then self.coll.b = true end
+				if cols[i].normal.y == -1 then private.coll.b = true end
 				if cols[i].normal.x ~=0 then
-					self.dir = self.dir *(-1)
+					private.dir = private.dir *(-1)
 				end
 			end
 		end
 	end
 	
-	self.draw = function()
-		love.graphics.rectangle("fill", self.x+camera.x, self.y + camera.y, self.w, self.h)
+	public.damage = function()
+		private.life = private.life-1
+		
 	end
 	
-	self.delete = function()
-		world1:remove(self.name)
-		targets[self.name] = nil
+	public.getLife = function()
+		return private.life
+	end
+	
+	public.getName = function()
+		return private.name
+	end
+	
+	public.draw = function()
+		love.graphics.rectangle("fill", private.x+camera.x, private.y + camera.y, private.w, private.h)
+	end
+	
+	public.delete = function()
+		world1:remove(private.name)
+		targets[private.name] = nil
 		tcount = tcount-1
 	end
 	
-	return self
+	return public
 end

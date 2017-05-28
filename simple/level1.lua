@@ -26,10 +26,10 @@ function level1.new()
 		end
 		targettimer = targettimer + dt
 		print(tcount)
-		if targettimer > 1 and tcount<15 then
+		if targettimer > 1 and tcount<1 then
 			tnum = (tnum+1)%300
 			newT = target.new(550,50,"t " .. tnum)
-			targets[newT.name] = newT
+			targets[newT.getName()] = newT
 			targettimer = 0
 			tcount = tcount+1
 		end
@@ -42,13 +42,18 @@ function level1.new()
 		camera.y = -Player.getY() +love.graphics.getHeight()/2
 	end
 	
+	function self.keypressed(key,unicode)
+		if key == "escape" then
+			love.event.quit(0)
+		end
+	end
+	
 	function self.draw()
-    		local touches = love.touch.getTouches()
- 
-    		for i, id in ipairs(touches) do
-      			local x, y = love.touch.getPosition(id)
-        		love.graphics.circle("fill", x, y, 20)
-    		end
+		local touches = love.touch.getTouches()
+		for i, id in ipairs(touches) do
+			local x, y = love.touch.getPosition(id)
+			love.graphics.circle("fill", x, y, 20)
+		end
 		for b, block in pairs(blocks) do
 			block.draw()
 		end

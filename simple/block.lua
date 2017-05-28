@@ -1,17 +1,18 @@
 block = {}
 
 function block.new(x, y,w,h, name)
-	local self = {}
-	self.x = x
-	self.y = y
-	self.h = h
-	self.w = w
-	self.name = name
-	world1:add(self.name, self.x, self.y, self.w, self.h)
+	local private = {}
+	local public = {}
+	private.x = x
+	private.y = y
+	private.h = h
+	private.w = w
+	private.name = name
+	world1:add(private.name, private.x, private.y, private.w, private.h)
 	
-	function self.draw()
-		love.graphics.rectangle("fill", self.x+camera.x, self.y+camera.y, self.w, self.h)
+	function public.draw()
+		love.graphics.rectangle("fill", private.x+camera.x, private.y+camera.y, private.w, private.h)
 	end
 	
-	return self
+	return public
 end

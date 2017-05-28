@@ -29,6 +29,27 @@ function player.new(x,y,name)
 	private.timerdamage = 0;
 	private.canmove = 1;
 	private.bullets = {}
+	private.buttons = {}
+	private.buttons.left = {}
+	private.buttons.left.x = love.graphics.getWidth()/18
+	private.buttons.left.y = (love.graphics.getHeight()/10)*8
+	private.buttons.left.w = love.graphics.getWidth()/7
+	private.buttons.left.h = love.graphics.getHeight()/7
+	private.buttons.right = {}
+	private.buttons.right.x = (love.graphics.getWidth()/18)*4
+	private.buttons.right.y = (love.graphics.getHeight()/10)*8
+	private.buttons.right.w = love.graphics.getWidth()/7
+	private.buttons.right.h = love.graphics.getHeight()/7
+	private.buttons.jump = {}
+	private.buttons.jump.x = (love.graphics.getWidth()/10)*7.8
+	private.buttons.jump.y = (love.graphics.getHeight()/10)*4.8
+	private.buttons.jump.w = love.graphics.getWidth()/7
+	private.buttons.jump.h = love.graphics.getHeight()/7
+	private.stick = {}
+	private.stick.x = (love.graphics.getWidth()/10)*8.5
+	private.stick.y = (love.graphics.getHeight()/10)*8
+	private.stick.r = love.graphics.getWidth()/10
+	private.teste = false
 	
 	local Playerfilter = function(item, other)
 		--print(other)
@@ -38,12 +59,35 @@ function player.new(x,y,name)
 		end
 	end
 	
+	
 	function public.getX()
 		return private.x
 	end
+	
 	function public.getY()
 		return private.y
 	end
+	
+	function private.movleft()
+				private.xvel = -350
+				private.dir = -1
+	end
+	
+	function private.movright()
+				private.xvel = 350
+				private.dir = 1
+	end
+	
+	function private.shoot(angle)
+				private.bulletcount = (private.bulletcount+1)%300
+				local newbullet = bullet.new(private.x+11, private.y+11,"bullet " .. tostring(private.bulletcount), private, angle)
+				private.bullets[newbullet.getName()] = newbullet
+				print(newbullet.getName())
+				private.bulltimer = 0
+	end
+	
+	
+	
 	
 	function public.update(dt)
 		private.bulltimer = private.bulltimer + dt
@@ -66,39 +110,63 @@ function player.new(x,y,name)
 			end
 		else
 			private.xvel = 0
-		
+			
+			
+			
 			if love.keyboard.isDown("a") then
-				private.xvel = -350
-				private.dir = -1
+				private.movleft()
 			end
 			if love.keyboard.isDown("d") then
-				private.xvel = 350
-				private.dir = 1
+				private.movright()
 			end
 			if love.keyboard.isDown("space") and private.coll.b == true then
 				private.yvel = -500
 			end
 		end
 		
-		if love.mouse.isDown(1) and private.bulltimer > private.bulltimermax then
-			private.bulletcount = (private.bulletcount+1)%300
-			private.mousevet.x, private.mousevet.y = love.mouse.getPosition()
-			
-			private.mousevet.x = (private.mousevet.x- (love.graphics.getWidth()/2+16))+love.math.random(-private.spray, private.spray)
-			private.mousevet.y = private.mousevet.y- (love.graphics.getHeight()/2+16)+love.math.random(-private.spray, private.spray)
-			local angle = math.atan2((private.mousevet.y), (private.mousevet.x))
-			print(private.mousevet.x .. ", " .. private.mousevet.y)
-			
-			
-			local newbullet = bullet.new(private.x+11, private.y+11,private.dir,"bullet " .. tostring(private.bulletcount), private, angle)
-			private.bullets[newbullet.name] = newbullet
-			print(newbullet.name)
-			private.bulltimer = 0
+		if love.system.getOS() ~= "Android" then
+			if love.mouse.isDown(1) and private.bulltimer > private.bulltimermax then
+				private.mousevet.x, private.mousevet.y = love.mouse.getPosition()
+				
+				private.mousevet.x = (private.mousevet.x- (love.graphics.getWidth()/2+16))+love.math.random(-private.spray, private.spray)
+				private.mousevet.y = private.mousevet.y- (love.graphics.getHeight()/2+16)+love.math.random(-private.spray, private.spray)
+				local angle = math.atan2((private.mousevet.y), (private.mousevet.x))
+				print(private.mousevet.x .. ", " .. private.mousevet.y)
+				
+				private.shoot(angle)
+			end
+		else
+			private.teste = false
+    		local touches = love.touch.getTouches()
+			for i,touch in pairs(touches) do
+				
+				local x,y = love.touch.getPosition(touch)
+				for b,button in pairs(private.buttons) do
+					if coll(x,y,1,1,button.x, button.y, button.w, button.h) and private.canmove ~= 0 then
+						if b == 'left' then
+							private.movleft()
+						end
+						if b == 'right' then
+							private.movright()
+						end
+						if b == 'jump' and private.coll.b then
+							private.yvel = -500
+						end
+					end
+					if dist(x,y,private.stick.x, private.stick.y)<private.stick.r and private.bulltimer>private.bulltimermax then
+						private.mousevet.x = (x-private.stick.x)+love.math.random(-private.spray, private.spray)
+						private.mousevet.y = (y-private.stick.y)+love.math.random(-private.spray, private.spray)
+						local angle = math.atan2(private.mousevet.y, private.mousevet.x)
+						private.shoot(angle)
+					end
+				end
+			end
 		end
+		
 		for b, bullet in pairs(private.bullets) do
 			bullet.update(dt)
-			if bullet.life<=0 then
-				world1:remove(bullet.name)
+			if bullet.getLife()<=0 then
+				world1:remove(bullet.getName())
 				private.bullets[b]= nil
 			end
 		end
@@ -131,6 +199,7 @@ function player.new(x,y,name)
 		
 	end
 	
+	
 	function public.draw()
 		love.graphics.print(private.yvel, 0,0)
 		love.graphics.print(private.x .. "\n" .. private.y .. "\n" .. tostring(private.coll.b) .. "\n" .. tostring(private.coll.t) .. "\n" .. private.bulltimer .. "\n" .. private.bulletcount .. "\n" .. private.ivul, 0,20)
@@ -138,8 +207,17 @@ function player.new(x,y,name)
 		for b, bullet in pairs(private.bullets) do
 			bullet.draw()
 		end
-		
+		--if(love.system.getOS() == "Android") then
+			for bu,button in pairs(private.buttons) do
+				love.graphics.rectangle("line", button.x, button.y, button.w, button.h)
+			end
+		--end
+		if private.teste == true then
+			love.graphics.print("whoo",0,120)
+		end
+		love.graphics.circle("line", private.stick.x,private.stick.y,private.stick.r)
 	end
+	
 	
 	return public
 end
